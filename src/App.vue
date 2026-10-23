@@ -31,7 +31,7 @@ async function search() {
   const params = new URLSearchParams({name: parts[0]!, count: '10', language: 'en', format: 'json'})
   if (parts[1]?.length === 2) params.set('countryCode', parts[1].toUpperCase())
   const geo = await getJson('https://geocoding-api.open-meteo.com/v1/search?' + params)
-  const place = geo.results?.[0]
+  const place = geo.results?.sort((a: {population?: number}, b: {population?: number}) => (b.population ?? 0) - (a.population ?? 0))[0]
   if (!place) throw new Error('City not found. Check the spelling or add a country code, such as AU.')
   const q = new URLSearchParams({latitude: String(place.latitude), longitude: String(place.longitude), current: 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m', timezone: 'auto'})
   const data = await getJson('https://api.open-meteo.com/v1/forecast?' + q)
